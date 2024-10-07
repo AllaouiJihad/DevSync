@@ -82,6 +82,7 @@ public class UserServlet extends HttpServlet {
         String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+//        String hashpassword = userService.hashPassword(password);
         String role = request.getParameter("role");
 
         User newUser = new User(firstName,lastName,email,password,UserRole.valueOf(role));

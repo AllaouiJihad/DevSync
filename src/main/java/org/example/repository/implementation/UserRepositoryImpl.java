@@ -17,6 +17,8 @@ public class UserRepositoryImpl implements UserRepository {
         this.entityManagerFactory = entityManagerFactory;
     }
 
+
+
     @Override
     public void save(User user) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();

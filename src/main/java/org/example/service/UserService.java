@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.model.entities.User;
 import org.example.repository.interfaces.UserRepository;
-
+//import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
 
 public class UserService {
@@ -37,4 +37,8 @@ public class UserService {
             System.out.println("User not found");
         }
     }
+
+//    public String hashPassword(String plainPassword) {
+//        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+//    }
 }

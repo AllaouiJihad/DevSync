@@ -4,11 +4,12 @@ import org.example.model.entities.Tag;
 import org.example.model.entities.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TagRepository {
-    void save(Tag tag);
+    Tag save(Tag tag);
 
-    Tag findById(Long id);
+    Optional<Tag> findById(Long id);
 
     List<Tag> findAll();
 }

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-
+@AllArgsConstructor
 @ToString
 public class Tag {
     @Id
@@ -24,8 +24,5 @@ public class Tag {
     public Tag() {
     }
 
-    public Tag(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+
 }

@@ -19,12 +19,10 @@ public interface TaskRepository {
 
     List<Task> getAll();
 
-    List<Task> getTasksByAssigneeId(Long userId);
-
-    List<Task> getTasksByCreatorId(Long userId);
+    List<Task> getTasksByAssigneeId(Long id);
+    List<Task> getTasksByCreatorId(Long id);
 
     List<Task> findOverdueTasks(LocalDate date);
-
     List<Task> findByTagsAndDateRangeAndCreator(String tag, LocalDateTime startDate, LocalDateTime endDate, Long creatorId);
 
 }

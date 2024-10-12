@@ -1,6 +1,7 @@
 package org.example.repository.implementation;
 
 import jakarta.persistence.*;
+import org.example.model.entities.Tag;
 import org.example.model.entities.Task;
 import org.example.model.entities.User;
 import org.example.repository.interfaces.TaskRepository;
@@ -22,20 +23,20 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
     @Override
     public Task save(Task task) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(task);
-            entityManager.getTransaction().commit();
-            return task; // Return the persisted task
-        } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            EntityTransaction transaction = entityManager.getTransaction();
+            try {
+                transaction.begin();
+                updateTasksTags(task, entityManager);
+                entityManager.persist(task);
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw new RuntimeException(e);
             }
-            System.out.println("Error saving task: " + e.getMessage());
-            return null;
-        } finally {
-            entityManager.close();
+            return task;
         }
     }
 
@@ -48,20 +49,20 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public Task update(Task task) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(task);
-            entityManager.getTransaction().commit();
-            return task;
-        } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            EntityTransaction transaction = entityManager.getTransaction();
+            try {
+                transaction.begin();
+                updateTasksTags(task, entityManager);
+                Task updatedTask = entityManager.merge(task);
+                transaction.commit();
+                return updatedTask;
+            } catch (Exception e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw new RuntimeException(e);
             }
-            System.out.println("Error updating task: " + e.getMessage());
-            return null;
-        } finally {
-            entityManager.close();
         }
     }
 
@@ -125,16 +126,86 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> getTasksByCreatorId(Long userId) {
-        return null;
+        List<Task> tasks = new ArrayList<>();
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            try {
+                User cretatedUser = userRepository.findById(userId).orElse(null);
+
+                if (cretatedUser != null) {
+                    tasks = entityManager.createQuery("SELECT t FROM Task t WHERE t.createdBy = :createBy", Task.class)
+                            .setParameter("createBy", cretatedUser)
+                            .getResultList();
+
+                }
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tasks;
     }
 
     @Override
     public List<Task> findOverdueTasks(LocalDate date) {
-        return null;
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            return entityManager.createQuery("SELECT t FROM Task t WHERE t.deadLine <= :date AND t.status!= 'TERMINEE'", Task.class)
+                    .setParameter("date", date)
+                    .getResultList();
+        }
     }
 
     @Override
     public List<Task> findByTagsAndDateRangeAndCreator(String tag, LocalDateTime startDate, LocalDateTime endDate, Long creatorId) {
-        return null;
+        List<Task> tasks = new ArrayList<>();
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+
+            try {
+                tasks = entityManager.createQuery(
+                                "SELECT t FROM Task t JOIN t.tags tg " +
+                                        "WHERE tg.name = :tag " +
+                                        "AND t.createdBy.id = :creatorId " +
+                                        "AND t.deadLine BETWEEN :startDate AND :endDate", Task.class)
+                        .setParameter("tag", tag)
+                        .setParameter("creatorId", creatorId)
+                        .setParameter("startDate", startDate)
+                        .setParameter("endDate", endDate)
+                        .getResultList();
+
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction.isActive()) {
+                    transaction.rollback();
+                }
+                throw new RuntimeException(e);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tasks;
     }
+
+    private void updateTasksTags(Task task, EntityManager entityManager) {
+        if (task.getTags() != null) {
+            for (int i = 0; i < task.getTags().size(); i++) {
+                Tag tag = task.getTags().get(i);
+                if (tag.getId() != null) {
+                    task.getTags().set(i, entityManager.merge(tag));
+                } else {
+                    entityManager.persist(tag);
+                }
+            }
+        }
+    }
+
+
 }

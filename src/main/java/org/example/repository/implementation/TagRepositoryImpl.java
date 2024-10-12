@@ -1,12 +1,11 @@
 package org.example.repository.implementation;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import org.example.model.entities.Tag;
 import org.example.model.entities.User;
 import org.example.repository.interfaces.TagRepository;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +13,8 @@ public class TagRepositoryImpl implements TagRepository {
 
     EntityManagerFactory entityManagerFactory;
 
-    public TagRepositoryImpl(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public TagRepositoryImpl() {
+        this.entityManagerFactory = Persistence.createEntityManagerFactory("DevSyncPU");
     }
 
     @Override
@@ -56,4 +55,51 @@ public class TagRepositoryImpl implements TagRepository {
 
         }
     }
+
+    @Override
+    public Tag update(Tag tag) {
+        try(EntityManager entityManager= entityManagerFactory.createEntityManager()) {
+            EntityTransaction transaction=entityManager.getTransaction();
+            try{
+                transaction.begin();
+                Tag updatedTag=entityManager.merge(tag);
+                transaction.commit();
+                return updatedTag;
+            } catch (Exception e) {
+                if(transaction.isActive()){
+                    transaction.rollback();
+                }
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        try (EntityManager entityManager= entityManagerFactory.createEntityManager()){
+            EntityTransaction transaction=entityManager.getTransaction();
+            try {
+                transaction.begin();
+                Tag tag=entityManager.find(Tag.class, id);
+                if(tag != null){
+                    entityManager.remove(tag);
+                }
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction.isActive()){
+                    transaction.rollback();
+                }
+                throw new RuntimeException(e);
+            }
+
+        }
+
+    }
+
+    @Override
+    public List<Tag> findByName(String name) {
+        return List.of();
+    }
+
+
 }

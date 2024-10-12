@@ -12,4 +12,9 @@ public interface TagRepository {
     Optional<Tag> findById(Long id);
 
     List<Tag> findAll();
+
+    Tag update(Tag tag);
+    void delete(Long id);
+
+    List<Tag> findByName(String name);
 }

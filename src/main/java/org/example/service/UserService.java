@@ -1,15 +1,17 @@
 package org.example.service;
 
 import org.example.model.entities.User;
+import org.example.repository.implementation.UserRepositoryImpl;
 import org.example.repository.interfaces.UserRepository;
-//import org.mindrot.jbcrypt.BCrypt;
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
+import java.util.Optional;
 
 public class UserService {
 
-    UserRepository userRepository;
+    UserRepositoryImpl userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepositoryImpl userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -17,7 +19,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User getUserById(Long id) {
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -30,15 +32,23 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        User user = getUserById(id);
-        if (user != null) {
-            userRepository.delete(user);
+        Optional<User> user = getUserById(id);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
         }else {
             System.out.println("User not found");
         }
     }
+    public String hashPassword(String plainPassword) {
+        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+    }
+    public User login(String username, String password) {
+        User u= userRepository.findByUsername(username);
+        if (u !=null && BCrypt.checkpw(password, u.getPassword())) {
+            return u;
+        }
+        return null;
+    }
 
-//    public String hashPassword(String plainPassword) {
-//        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
-//    }
+
 }

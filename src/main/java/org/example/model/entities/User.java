@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.model.enums.UserRole;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
+
 public class User {
 
     @Id
@@ -17,10 +20,14 @@ public class User {
     private Long id;
     private String firstName;
     private String lastName;
+    private String userName;
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToMany
+    private List<Task> tasks;
 
     public User() {
     }

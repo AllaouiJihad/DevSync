@@ -10,17 +10,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.model.entities.User;
 import org.example.model.enums.UserRole;
 import org.example.repository.implementation.UserRepositoryImpl;
-import org.example.repository.interfaces.UserRepository;
 import org.example.service.UserService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+
 @WebServlet("/users")
 
 public class UserServlet extends HttpServlet {
 
-    EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("DevSyncPU");
-    UserRepository userRepository = new UserRepositoryImpl(entityManagerFactory);
+    UserRepositoryImpl userRepository = new UserRepositoryImpl();
     UserService userService = new UserService(userRepository);
 
     @Override
@@ -53,11 +53,14 @@ public class UserServlet extends HttpServlet {
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long userId = Long.parseLong(request.getParameter("id"));
-        User user = userService.getUserById(userId);
-        if (user== null) {
+        Optional<User> userOptional = userService.getUserById(userId);
+
+        if (!userOptional.isPresent()) {
             response.sendRedirect(request.getContextPath() + "/users?action=list");
             return;
         }
+
+        User user = userOptional.get();
         request.setAttribute("user", user);
         request.getRequestDispatcher("/WEB-INF/views/editUserForm.jsp").forward(request, response);
     }
@@ -84,10 +87,10 @@ public class UserServlet extends HttpServlet {
         String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-//        String hashpassword = userService.hashPassword(password);
+        String hashpassword = userService.hashPassword(password);
         String role = request.getParameter("role");
 
-        User newUser = new User(firstName,lastName,email,password,UserRole.valueOf(role));
+        User newUser = new User(firstName,lastName,email,hashpassword,UserRole.valueOf(role));
         userService.createUser(newUser);
         response.sendRedirect(request.getContextPath() + "/users?action=list");
     }

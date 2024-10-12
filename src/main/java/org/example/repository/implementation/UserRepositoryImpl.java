@@ -1,20 +1,18 @@
 package org.example.repository.implementation;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import org.example.model.entities.User;
 import org.example.repository.interfaces.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepositoryImpl implements UserRepository {
 
     EntityManagerFactory entityManagerFactory;
 
-    public UserRepositoryImpl(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
+    public UserRepositoryImpl() {
+        this.entityManagerFactory = Persistence.createEntityManagerFactory("DevSyncPU");
     }
 
 
@@ -37,9 +35,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findById(Long id) {
+    public Optional<User> findById(Long id) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            return entityManager.find(User.class, id);
+            User user = entityManager.find(User.class, id);
+
+            return Optional.ofNullable(user);
         }
     }
 
@@ -87,6 +87,19 @@ public class UserRepositoryImpl implements UserRepository {
             System.out.println(e.getMessage());
         } finally {
             entityManager.close();
+        }
+    }
+
+    public User findByUsername(String userName) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.userName = :userName", User.class);
+        query.setParameter("userName", userName);
+        try{
+            return query.getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }finally {
+            em.close();
         }
     }
 

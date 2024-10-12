@@ -9,7 +9,7 @@ public interface UserRepository {
 
     void save(User user);
 
-    User findById(Long id);
+    Optional<User> findById(Long id);
 
     List<User> findAll();
 

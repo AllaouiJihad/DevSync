@@ -11,7 +11,7 @@ public class UserTokenRepositoryImpl implements UserTokenRepository {
 
     EntityManagerFactory entityManagerFactory;
 
-    public UserTokenRepositoryImpl(EntityManagerFactory entityManagerFactory) {
+    public UserTokenRepositoryImpl() {
         this.entityManagerFactory = Persistence.createEntityManagerFactory("DevSyncPU");
     }
 

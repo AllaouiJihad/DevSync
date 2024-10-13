@@ -14,8 +14,9 @@ import java.util.Optional;
 public class TagService {
     TagRepositoryImpl tagRepository;
 
-    public TagService(TagRepositoryImpl tagRepository) {
-        this.tagRepository = tagRepository;
+    public TagService() {
+
+        this.tagRepository = new TagRepositoryImpl();
     }
 
     public Tag addTag(Tag tag){

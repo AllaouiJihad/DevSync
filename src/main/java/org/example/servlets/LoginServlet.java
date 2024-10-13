@@ -17,10 +17,9 @@ import java.io.IOException;
 public class LoginServlet extends HttpServlet {
     private UserService userService;
 
-    UserRepositoryImpl userRepository = new UserRepositoryImpl();
     @Override
     public void init() throws ServletException {
-        userService = new UserService(userRepository);
+        userService = new UserService();
     }
 
     @Override

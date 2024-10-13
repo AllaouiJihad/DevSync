@@ -30,7 +30,7 @@
           <div class="author-card-avatar"><img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="Daniel Adams">
           </div>
           <div class="author-card-details">
-            <h5 class="author-card-name text-lg">${currentUser.nom} ${currentUser.prenom}</h5><span class="author-card-position">${currentUser.email}</span>
+            <h5 class="author-card-name text-lg">${currentUser.firstName} ${currentUser.lastName}</h5><span class="author-card-position">${currentUser.email}</span>
           </div>
         </div>
       </div>

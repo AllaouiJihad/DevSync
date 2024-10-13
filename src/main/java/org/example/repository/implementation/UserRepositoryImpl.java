@@ -90,10 +90,10 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    public User findByUsername(String userName) {
+    public User findByEmail(String email) {
         EntityManager em = entityManagerFactory.createEntityManager();
-        TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.userName = :userName", User.class);
-        query.setParameter("userName", userName);
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+        query.setParameter("email", email);
         try{
             return query.getSingleResult();
         }catch (NoResultException e){

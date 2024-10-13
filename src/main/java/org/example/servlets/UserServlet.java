@@ -20,8 +20,7 @@ import java.util.Optional;
 
 public class UserServlet extends HttpServlet {
 
-    UserRepositoryImpl userRepository = new UserRepositoryImpl();
-    UserService userService = new UserService(userRepository);
+    UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

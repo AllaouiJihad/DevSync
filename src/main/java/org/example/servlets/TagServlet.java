@@ -21,8 +21,7 @@ import java.util.List;
 public class TagServlet extends HttpServlet {
 
 
-    TagRepositoryImpl tagRepository= new TagRepositoryImpl();
-    TagService tagService = new TagService(tagRepository);
+    TagService tagService = new TagService();
 
 
     @Override

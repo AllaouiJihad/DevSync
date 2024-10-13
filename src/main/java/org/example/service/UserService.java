@@ -11,8 +11,9 @@ public class UserService {
 
     UserRepositoryImpl userRepository;
 
-    public UserService(UserRepositoryImpl userRepository) {
-        this.userRepository = userRepository;
+    public UserService() {
+
+        this.userRepository = new UserRepositoryImpl();
     }
 
     public void createUser(User user) {
@@ -42,8 +43,8 @@ public class UserService {
     public String hashPassword(String plainPassword) {
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
     }
-    public User login(String username, String password) {
-        User u= userRepository.findByUsername(username);
+    public User login(String email, String password) {
+        User u= userRepository.findByEmail(email);
         if (u !=null && BCrypt.checkpw(password, u.getPassword())) {
             return u;
         }

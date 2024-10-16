@@ -91,7 +91,7 @@ public class TaskServlet extends HttpServlet {
                 HttpSession session = req.getSession();
                 User currentUser = (User) session.getAttribute("currentUser");
                 Task task = new Task();
-                if(currentUser.getRole()== UserRole.MANAGER){
+                if(currentUser.getRole() == UserRole.MANAGER){
 
                     long assignedTo = Long.parseLong(req.getParameter("assignedTo"));
                     User assignedToUser = userService.getUserById(assignedTo).orElse(null);

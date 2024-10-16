@@ -59,7 +59,7 @@
                             <label>Assigned To</label>
                             <select name="assignedTo" class="form-control" required>
                                 <c:forEach var="user" items="${utilisateurList}">
-                                    <option value="${user.id}">${user.nom} ${user.prenom}</option>
+                                    <option value="${user.id}">${user.firstName} ${user.lastName}</option>
                                 </c:forEach>
                             </select>
                         </div>

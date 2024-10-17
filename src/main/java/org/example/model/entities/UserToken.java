@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.model.enums.TokenType;
 
 import java.time.LocalDate;
 
@@ -17,17 +18,34 @@ public class UserToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    private TokenType type;
+
+    @Column(name = "expiration_date")
+    private LocalDate expirationDate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "token_type", length = 50, nullable = false)
-    private String tokenType;
+    private boolean used;
 
-    @Column(name = "token_count", nullable = false)
-    private int tokenCount = 2;
+    @Column(name = "token_count")
+    private int tokenCount;
 
-    @Column(name = "last_reset", nullable = false)
-    private LocalDate lastReset;
+    public UserToken(TokenType type, LocalDate expirationDate, User user, int tokenCount) {
+        this.type = type;
+        this.expirationDate = expirationDate;
+        this.user = user;
+        this.used = false;
+        this.tokenCount = tokenCount;
+    }
+
+    public void useToken() {
+        if (!used && LocalDate.now().isBefore(expirationDate)) {
+            this.used = true;
+        } else {
+            throw new IllegalStateException("Token is already used");
+        }
+    }
 }
